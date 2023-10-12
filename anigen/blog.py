@@ -48,16 +48,13 @@ def create():
 
         https://stackoverflow.com/questions/61534027/how-should-i-handle-duplicate-filenames-when-uploading-a-file-with-flask
 
-        path = f"images/{g.user['id']}"
+        path = f"static/images/{g.user['id']}"
         os.mkdir(path)
 
         ident = uuid4().__str__()
         path = f"images/{g.user['id']}/ani_{ident}.png"
         image.save(path)
         """
-
-        prompt = "a photo of an astronaut riding a horse on mars"
-        image = pipe(prompt).images[0]
 
         if error is not None:
             flash(error)
