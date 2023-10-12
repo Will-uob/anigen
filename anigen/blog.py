@@ -5,6 +5,13 @@ from werkzeug.exceptions import abort
 from anigen.auth import login_required
 from anigen.db import get_db
 
+from uuid import uuid4
+import os
+
+# import torch
+# from torch import autocast
+# from diffusers import StableDiffusionPipeline
+
 bp = Blueprint('blog', __name__)
 
 @bp.route('/')
@@ -29,12 +36,36 @@ def create():
         if not title:
             error = 'Title is required.'
 
+        """
+        This code will be tested on the lab machine tomorrow!
+        pipe = StableDiffusionPipeline.from_pretrained(
+        'hakurei/waifu-diffusion',
+        torch_dtype=torch.float32
+        ).to('cuda')
+
+        with autocast("cuda"):
+             image = pipe(prompt, guidance_scale=6)[0][0]
+
+        https://stackoverflow.com/questions/61534027/how-should-i-handle-duplicate-filenames-when-uploading-a-file-with-flask
+
+        path = f"images/{g.user['id']}"
+        os.mkdir(path)
+
+        ident = uuid4().__str__()
+        path = f"images/{g.user['id']}/ani_{ident}.png"
+        image.save(path)
+        """
+
+        prompt = "a photo of an astronaut riding a horse on mars"
+        image = pipe(prompt).images[0]
+
         if error is not None:
             flash(error)
         else:
             db = get_db()
             db.execute(
                 'INSERT INTO post (title, seed, prompt, filepath, author_id)'
+                # (title, seed, prompt, path, g.user['id'])
                 ' VALUES (?, ?, ?, ?, ?)',
                 (title, seed, prompt, "hello", g.user['id'])
             )
@@ -50,6 +81,8 @@ def get_post(id, check_author=True):
         ' WHERE p.id = ?',
         (id,)
     ).fetchone()
+
+    # SELECT p.id, title, seed, created, author_id, username, filepath
 
     if post is None:
         abort(404, f"Post id {id} doesn't exist.")

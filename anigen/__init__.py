@@ -1,7 +1,6 @@
 import os
 from flask import Flask
 
-
 def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
@@ -22,6 +21,8 @@ def create_app(test_config=None):
         os.makedirs(app.instance_path)
     except OSError:
         pass
+
+    # setup stable diffusion stuff now, so that it doesn't have to start-up every time someone wants to post
 
     from . import db
     db.init_app(app)
