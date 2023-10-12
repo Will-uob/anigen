@@ -123,7 +123,9 @@ def update(id):
 @bp.route('/<int:id>/delete', methods=('POST',))
 @login_required
 def delete(id):
+    # post = get_post(id)
     get_post(id)
+    # os.remove(post[-1]) -> Removes the image from directory, before we delete the post!
     db = get_db()
     db.execute('DELETE FROM post WHERE id = ?', (id,))
     db.commit()
