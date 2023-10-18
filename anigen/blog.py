@@ -1,16 +1,18 @@
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, url_for
+    Blueprint, flash, g, redirect, render_template, request, url_for, current_app
 )
 from werkzeug.exceptions import abort
 from anigen.auth import login_required
 from anigen.db import get_db
+from PIL import Image
 
 """ Json and requests look like really useful libraries to learn desu"""
 import json
 import requests
+import io
 
 API_URL = "https://api-inference.huggingface.co/models/hakurei/waifu-diffusion"
-API_TOKEN = ""
+API_TOKEN = "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"
 headers = {"Authorization": f"Bearer {API_TOKEN}"}
 
 from uuid import uuid4
@@ -44,16 +46,29 @@ def create():
         if not title:
             error = 'Title is required.'
 
-        image = query({
+        image_bytes = query({
 	        "inputs": prompt,
         })
 
-        path = f"static/images/{g.user['id']}"
+        """
+        path = f"./static/images/{g.user['id']}"
         os.mkdir(path)
 
         ident = uuid4().__str__()
         path = f"images/{g.user['id']}/ani_{ident}.png"
         image.save(path)
+        """
+
+        image = Image.open(io.BytesIO(image_bytes))
+
+        path = os.path.join(current_app.config['UPLOAD_FOLDER'], str(g.user['id']))
+        os.mkdir(path)
+
+        ident = uuid4().__str__()
+        filename = f"ani_{ident}.png"
+
+        filepath = os.path.join(path, filename)
+        image.save(filepath)
 
         if error is not None:
             flash(error)
@@ -146,4 +161,5 @@ Legacy stuffs
         ident = uuid4().__str__()
         path = f"images/{g.user['id']}/ani_{ident}.png"
         image.save(path)
+        
 """
