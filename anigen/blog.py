@@ -12,7 +12,7 @@ import requests
 import io
 
 API_URL = "https://api-inference.huggingface.co/models/hakurei/waifu-diffusion"
-API_TOKEN = ""
+API_TOKEN = "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"
 headers = {"Authorization": f"Bearer {API_TOKEN}"}
 
 from uuid import uuid4
@@ -28,10 +28,11 @@ bp = Blueprint('blog', __name__)
 def index():
     db = get_db()
     posts = db.execute(
-        'SELECT p.id, title, seed, created, author_id, username'
+        'SELECT p.id, title, seed, created, author_id, username, filepath'
         ' FROM post p JOIN user u ON p.author_id = u.id'
         ' ORDER BY created DESC'
     ).fetchall()
+    print(posts)
     return render_template('blog/index.html', posts=posts)
 
 @bp.route('/create', methods=('GET', 'POST'))
@@ -50,15 +51,6 @@ def create():
 	        "inputs": prompt,
         })
 
-        """
-        path = f"./static/images/{g.user['id']}"
-        os.mkdir(path)
-
-        ident = uuid4().__str__()
-        path = f"images/{g.user['id']}/ani_{ident}.png"
-        image.save(path)
-        """
-
         image = Image.open(io.BytesIO(image_bytes))
 
         path = os.path.join(current_app.config['UPLOAD_FOLDER'], str(g.user['id']))
@@ -76,9 +68,8 @@ def create():
             db = get_db()
             db.execute(
                 'INSERT INTO post (title, seed, prompt, filepath, author_id)'
-                # (title, seed, prompt, path, g.user['id'])
                 ' VALUES (?, ?, ?, ?, ?)',
-                (title, seed, prompt, "hello", g.user['id'])
+                (title, seed, prompt, filepath, g.user['id'])
             )
             db.commit()
             return redirect(url_for('blog.index'))
@@ -87,7 +78,7 @@ def create():
 
 def get_post(id, check_author=True):
     post = get_db().execute(
-        'SELECT p.id, title, seed, created, author_id, username'
+        'SELECT p.id, title, seed, created, author_id, username, filepath'
         ' FROM post p JOIN user u ON p.author_id = u.id'
         ' WHERE p.id = ?',
         (id,)

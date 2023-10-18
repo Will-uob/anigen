@@ -20,7 +20,8 @@
         {% endif %}
     </header>
     <p class="body">{{ post['seed'] }}</p>
-    <!-- <img src=\{\{ post['filepath'] \}\} alt="Picture of an anime girl!">  : Should be where picture goes. Also, how will this know where the image is?-->
+    <p class="body">{{ post['filepath'] }}</p>
+    <img src="{{ post['filepath'] }}" alt="Girl in a jacket" width="500" height="600"> 
 </article>
 {% if not loop.last %}
 <hr>
