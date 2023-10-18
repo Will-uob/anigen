@@ -5,12 +5,20 @@ from werkzeug.exceptions import abort
 from anigen.auth import login_required
 from anigen.db import get_db
 
+""" Json and requests look like really useful libraries to learn desu"""
+import json
+import requests
+
+API_URL = "https://api-inference.huggingface.co/models/hakurei/waifu-diffusion"
+API_TOKEN = "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"
+headers = {"Authorization": f"Bearer {API_TOKEN}"}
+
 from uuid import uuid4
 import os
 
-# import torch
-# from torch import autocast
-# from diffusers import StableDiffusionPipeline
+def query(payload):
+	response = requests.post(API_URL, headers=headers, json=payload)
+	return response.content
 
 bp = Blueprint('blog', __name__)
 
@@ -36,17 +44,9 @@ def create():
         if not title:
             error = 'Title is required.'
 
-        """
-        This code will be tested on the lab machine tomorrow!
-        pipe = StableDiffusionPipeline.from_pretrained(
-        'hakurei/waifu-diffusion',
-        torch_dtype=torch.float32
-        ).to('cuda')
-
-        with autocast("cuda"):
-             image = pipe(prompt, guidance_scale=6)[0][0]
-
-        https://stackoverflow.com/questions/61534027/how-should-i-handle-duplicate-filenames-when-uploading-a-file-with-flask
+        image = query({
+	        "inputs": prompt,
+        })
 
         path = f"static/images/{g.user['id']}"
         os.mkdir(path)
@@ -54,7 +54,6 @@ def create():
         ident = uuid4().__str__()
         path = f"images/{g.user['id']}/ani_{ident}.png"
         image.save(path)
-        """
 
         if error is not None:
             flash(error)
@@ -127,3 +126,24 @@ def delete(id):
     db.execute('DELETE FROM post WHERE id = ?', (id,))
     db.commit()
     return redirect(url_for('blog.index'))
+
+"""
+Legacy stuffs
+        This code will be tested on the lab machine tomorrow!
+        pipe = StableDiffusionPipeline.from_pretrained(
+        'hakurei/waifu-diffusion',
+        torch_dtype=torch.float32
+        ).to('cuda')
+
+        with autocast("cuda"):
+             image = pipe(prompt, guidance_scale=6)[0][0]
+
+        https://stackoverflow.com/questions/61534027/how-should-i-handle-duplicate-filenames-when-uploading-a-file-with-flask
+
+        path = f"static/images/{g.user['id']}"
+        os.mkdir(path)
+
+        ident = uuid4().__str__()
+        path = f"images/{g.user['id']}/ani_{ident}.png"
+        image.save(path)
+"""
