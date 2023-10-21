@@ -1,5 +1,5 @@
 import os
-from flask import Flask
+from flask import Flask, current_app
 
 def create_app(test_config=None):
     # create and configure the app
@@ -10,13 +10,17 @@ def create_app(test_config=None):
     if not os.path.exists(directory):
         os.mkdir(directory)
     """
-    
+
     app.config.from_mapping(
         SECRET_KEY='dev',
         DATABASE=os.path.join(app.instance_path, 'flaskr.sqlite'),
         UPLOAD_FOLDER = os.path.join(app.instance_path, 'images'),
         STATIC_FOLDER = "anigen/static/"
     )
+
+    image_dir = os.path.join(app.config['STATIC_FOLDER'],"images/")
+    if not os.path.exists(image_dir):
+        os.mkdir(image_dir)
 
     if test_config is None:
         # load the instance config, if it exists, when not testing

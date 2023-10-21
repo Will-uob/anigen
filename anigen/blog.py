@@ -12,7 +12,7 @@ import requests
 import io
 
 API_URL = "https://api-inference.huggingface.co/models/hakurei/waifu-diffusion"
-API_TOKEN = ""
+API_TOKEN = "" # Insert your own token here!
 headers = {"Authorization": f"Bearer {API_TOKEN}"}
 
 from uuid import uuid4
