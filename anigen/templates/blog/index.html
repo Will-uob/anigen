@@ -20,8 +20,7 @@
         {% endif %}
     </header>
     <p class="body">{{ post['seed'] }}</p>
-    <p class="body">{{ post['filepath'] }}</p>
-    <img src="{{ post['filepath'] }}" alt="Girl in a jacket" width="500" height="600"> 
+    <img src="{{ url_for('static', filename="/images/" + post['filepath']) }}" alt="Girl in a jacket" width="500" height="600"> 
 </article>
 {% if not loop.last %}
 <hr>

@@ -13,6 +13,7 @@ def create_app(test_config=None):
         SECRET_KEY='dev',
         DATABASE=os.path.join(app.instance_path, 'flaskr.sqlite'),
         UPLOAD_FOLDER = os.path.join(app.instance_path, 'images'),
+        STATIC_FOLDER = "anigen/static/"
     )
 
     if test_config is None:

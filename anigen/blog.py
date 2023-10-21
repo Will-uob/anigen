@@ -12,7 +12,7 @@ import requests
 import io
 
 API_URL = "https://api-inference.huggingface.co/models/hakurei/waifu-diffusion"
-API_TOKEN = "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"
+API_TOKEN = ""
 headers = {"Authorization": f"Bearer {API_TOKEN}"}
 
 from uuid import uuid4
@@ -52,15 +52,26 @@ def create():
         })
 
         image = Image.open(io.BytesIO(image_bytes))
-
+        
+        """
         path = os.path.join(current_app.config['UPLOAD_FOLDER'], str(g.user['id']))
-        os.mkdir(path)
+        if not os.path.exists(path):
+            os.mkdir(path)
+        """
+
+        path = os.path.join(current_app.config['STATIC_FOLDER']+"images/", str(g.user['id']))
+        if not os.path.exists(path):
+            os.mkdir(path)
 
         ident = uuid4().__str__()
         filename = f"ani_{ident}.png"
-
+        
+        """
         filepath = os.path.join(path, filename)
         image.save(filepath)
+        """
+        filepath = str(g.user['id']) + "/" + filename
+        image.save(current_app.config['STATIC_FOLDER']+"images/"+str(g.user['id'])+"/"+filename)
 
         if error is not None:
             flash(error)
